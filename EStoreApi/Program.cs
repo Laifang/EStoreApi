@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
+// 添加跨域中间件
+builder.Services.AddCors();
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -45,5 +47,9 @@ catch (Exception ex)
     logger.LogError(ex, "An error occurred while migrating the database."); // 捕获异常并抛出
 }
 
+app.UseCors(options =>{
+    // 为 域名 http://localhost:3000  开放跨域请求
+    options.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+});
 
 app.Run();
