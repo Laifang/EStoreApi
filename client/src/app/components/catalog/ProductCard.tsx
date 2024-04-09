@@ -1,6 +1,5 @@
 import { Card, CardMedia, CardContent, Typography, CardActions, Button, Avatar, CardHeader } from "@mui/material";
-import { Product } from "../../../models/product";
-
+import { Product } from "../../models/product";
 interface Props {
     product: Product;
 }
@@ -18,7 +17,7 @@ export default function ProductCard({ product }: Props) {
                     titleTypographyProps={{ fontWeight: "bold", color: "primary.main" }}
                 />
                 <CardMedia
-                    sx={{ height: 140, backgroundSize: "contain" ,bgcolor: "primary.light"}}
+                    sx={{ height: 140, backgroundSize: "contain"}}
                     image={product.imageUrl}
                     title={product.name}
                     
