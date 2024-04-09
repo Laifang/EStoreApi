@@ -1,6 +1,5 @@
 import { Fragment } from "react/jsx-runtime";
-import { Product } from "../../../models/product";
-import { Typography } from "@mui/material";
+import { Product } from "../../models/Product";
 import ProductList from "./ProductList";
 import { useState, useEffect } from "react";
 
@@ -18,7 +17,6 @@ export default function Catalog() {
 
     return (
         <Fragment>
-            <Typography variant="h4">产品目录</Typography>
             <ProductList products={products} />
         </Fragment>
 
