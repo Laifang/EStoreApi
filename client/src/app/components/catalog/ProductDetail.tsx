@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Product } from "../../models/product";
 import { Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
-import { Image } from "@mui/icons-material";
+import agent from "../../api/agent";
 
 export default function ProductDetail() {
   // Todo: 需要在详情组件访问 router参数，并显示相应的产品信息
@@ -13,10 +13,11 @@ export default function ProductDetail() {
 
 
   useEffect(() => {
-    axios.get(`http://localhost:5130/api/products/${id}`)
-      .then(response => setProduct(response.data))
-      .catch(error => console.log(error))
-      .finally(() => setLoading(false))
+    // 保证id参数存在
+    id && agent.Catalog.detail(parseInt(id))
+      .then((product: Product) => setProduct(product))
+      .catch((error) => console.error(error.response))
+      .finally(() => setLoading(false));
   }, [id]);
 
   if (loading) {
@@ -31,7 +32,7 @@ export default function ProductDetail() {
     <>
       <Grid container spacing={6}>
         <Grid item xs={6}>
-          <img src={product.imageUrl} alt={product.name} style={{width: "100%"}}/>
+          <img src={product.imageUrl} alt={product.name} style={{ width: "100%" }} />
         </Grid>
         <Grid item xs={6}>
           <Typography variant="h3">{product.name}</Typography>
