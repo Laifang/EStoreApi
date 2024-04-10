@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
+import { toast } from "react-toastify";
 
 // 设置默认的baseURL
 axios.defaults.baseURL = "http://localhost:5130/api";
@@ -12,19 +13,28 @@ axios.interceptors.response.use(
         return response;
     },
     (error: AxiosError) => {
-        console.log('Catch Error by Interceptor');
+        const {data,status} = error.response as AxiosResponse;
+        switch (status) {
+            case 400:
+                toast.error(data.title);
+                break;
+            case 401:
+                toast.error("Unauthorized");
+                break;
+            case 404:
+                toast.error("Not Found");
+                break;
+            // case 422:
+            //     toast.error(data.errors[0].message);
+            //     break;
+            case 500:
+                toast.error("Internal Server Error");
+                break;
+            default:
+                // toast.error("Unknown Error");
+                break;
+        }
         return Promise.reject(error); // 让错误继续向上传递
-
-        // if (error.response) {
-        //     // 请求已发送，但服务器响应的状态码不在 2xx 范围内
-        //     console.log(error.response.data);
-        //     console.log(error.response.status);
-        //     console.log(error.response.headers);
-        // } else {
-        //     // 一些错误是在设置请求时触发的，如网络错误，超时等
-        //     console.log("Error", error.message);
-        // }
-        // return Promise.reject(error);
     }
 );
 

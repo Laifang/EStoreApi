@@ -10,7 +10,7 @@ export default function Catalog() {
 
     useEffect(() => {
         agent.Catalog.list()
-           .then(products => setProducts(products))
+            .then(products => setProducts(products))
     }, [])
 
 
