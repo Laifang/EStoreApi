@@ -1,4 +1,5 @@
 using EStoreApi.Entities;
+using EStoreApi.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EStoreApi.Data
@@ -12,5 +13,7 @@ namespace EStoreApi.Data
         }
 
         public DbSet<Product> Products { get; set; }
+
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
     }
 }
