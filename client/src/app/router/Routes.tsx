@@ -7,6 +7,7 @@ import Catalog from "../components/catalog/Catalog";
 import ProductDetail from "../components/catalog/ProductDetail";
 import ServerError from "../components/error/ServerError";
 import NotFound from "../components/error/NotFound";
+import ShoppingCartPage from "../components/shoppingCart/ShoppingCartPage";
 
 
 const router = createBrowserRouter([
@@ -20,9 +21,9 @@ const router = createBrowserRouter([
             { path: "catalog/:id", element: <ProductDetail /> },
             { path: "contact", element: <ContactPage /> },
             { path: "about", element: <AboutPage /> },
-            { path: "/server-error", element: <ServerError /> },
-            { path: "/not-found", element: <NotFound /> },
-            // 默认路由
+            { path: "server-error", element: <ServerError /> },
+            { path: "not-found", element: <NotFound /> },
+            { path: "shopingcart", element: <ShoppingCartPage /> },
             { path: "*", element: <NotFound /> }
         ]
     }

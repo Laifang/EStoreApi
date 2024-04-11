@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Product } from "../../models/product";
+import { Product } from "../../models/Product";
 import { Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
 import agent from "../../api/agent";
 import Loading from "../loading/Loading";

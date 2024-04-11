@@ -52,8 +52,12 @@ catch (Exception ex)
 }
 
 app.UseCors(options =>{
-    // 为 域名 http://localhost:3000  开放跨域请求
-    options.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+    // 为 域名 http://localhost:3000  
+    // AllowAnyHeader 作用：允许任何请求头
+    // AllowAnyMethod 作用：允许任何请求方法
+    // AllowCredentials 作用：允许跨域请求带有凭据（cookies、HTTP认证等）
+    // WithOrigins 作用：允许跨域请求的源
+    options.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:3000");
 });
 
 app.Run();

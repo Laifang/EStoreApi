@@ -7,6 +7,7 @@ const sleep = () => new Promise(resolve => setTimeout(resolve, 300))
 
 // 设置默认的baseURL
 axios.defaults.baseURL = "http://localhost:5130/api";
+axios.defaults.withCredentials = true; // 允许跨域请求带cookie,要与后端同时配置这个选项才能
 
 // 作用：将axios的response.data返回
 const responseBody = (response: AxiosResponse) => response.data;
@@ -75,9 +76,17 @@ const TestErrors = {
 }
 
 
+const ShoppingCart = {
+    get: () => requests.get("/ShoppingCarts"),
+    addItem: (productId: number, quantity: number = 1) => requests.post(`ShoppingCarts/addItem?productId=${productId}&quantity=${quantity}`, {}),
+    removeItem: (productId: number, quantity: number = 1) => requests.delete(`ShoppingCarts/removeItem?productId=${productId}&quantity=${quantity}`),
+}
+
+
 const agent = {
     Catalog,
-    TestErrors
+    TestErrors,
+    ShoppingCart,
 }
 
 // agent 导出

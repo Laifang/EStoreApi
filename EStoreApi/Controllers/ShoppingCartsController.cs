@@ -16,7 +16,7 @@ public class ShoppingCartsController : BasicApiController
         _context = context;
     }
 
-    [HttpGet(Name=nameof(GetShoppingCart))]
+    [HttpGet(Name = nameof(GetShoppingCart))]
     public async Task<ActionResult<ShoppingCartDto>> GetShoppingCart()
     {
         var shoppingcart = await CheckShoppingCart();
@@ -32,7 +32,7 @@ public class ShoppingCartsController : BasicApiController
     // Add Item To shopping cart
 
     [HttpPost("addItem")]
-    public async Task<ActionResult<ShoppingCartDto>> AddItemToShoppingCart(int productId, int quantity)
+    public async Task<ActionResult<ShoppingCartDto>> AddItemToShoppingCart(int productId, int quantity = 1)
     {
         // 1. 获取/创建 shpping cart
         // 2. 获取/检查 product
@@ -53,7 +53,7 @@ public class ShoppingCartsController : BasicApiController
     }
 
     [HttpDelete("removeItem")]
-    public async Task<ActionResult> RemoveShoppingCartItem(int productId, int quantity)
+    public async Task<ActionResult> RemoveShoppingCartItem(int productId, int quantity = 1)
     {
         // 1. 获取/检查 shopping cart
         // 2. 检查 product 是否存在
@@ -72,7 +72,7 @@ public class ShoppingCartsController : BasicApiController
 
         shoppingcart.RemoveItem(productId, quantity);
         var removeResult = await _context.SaveChangesAsync() > 0;
-        if (removeResult) return Ok();
+        if (removeResult) return CreatedAtRoute(nameof(GetShoppingCart), MapShoppingCartDto(shoppingcart));
 
         return BadRequest(new ProblemDetails { Title = "从购物车中移除商品时发生错误" });
     }
@@ -120,7 +120,7 @@ public class ShoppingCartsController : BasicApiController
             {
                 ProductId = item.ProductId,
                 Price = item.Product.Price,
-                ProductNmae = item.Product.Name,
+                ProductName = item.Product.Name,
                 ImageUrl = item.Product.ImageUrl,
                 Type = item.Product.Type,
                 Brand = item.Product.Brand,

@@ -5,7 +5,7 @@ using EStoreApi.Models;
 public class ShoppingCartItemDto
 {
     public int ProductId { get; set; }
-    public string ProductNmae { get; set; }
+    public string ProductName { get; set; }
 
     public Decimal Price { get; set; }
 
