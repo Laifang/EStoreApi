@@ -1,5 +1,9 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
+import router from "../router/Routes";
+
+const sleep = () => new Promise(resolve => setTimeout(resolve, 300))
+
 
 // 设置默认的baseURL
 axios.defaults.baseURL = "http://localhost:5130/api";
@@ -9,32 +13,40 @@ const responseBody = (response: AxiosResponse) => response.data;
 
 // 拦截器
 axios.interceptors.response.use(
-    (response) => {
+    async response => {
+        await sleep(); // 延迟500ms，模拟网络延迟
         return response;
     },
     (error: AxiosError) => {
-        const {data,status} = error.response as AxiosResponse;
+        // 解构赋值出 data 和 status,data是服务器返回的错误信息，status是状态码
+        const { data, status } = error.response as AxiosResponse;
         switch (status) {
             case 400:
+                if (data.errors) { // 如果存在错误信息，则将错误信息格式化
+                    const modelStateErrors: string[] = [];
+                    for (const key in data.errors) {
+                        if (data.errors[key]) { //防止不存在key的情况
+                            modelStateErrors.push(data.errors[key]);
+                        }
+                    }
+                    // 将错误信息数组展平成字符串并抛出
+                    throw modelStateErrors.flat();
+                }
                 toast.error(data.title);
                 break;
             case 401:
-                toast.error("Unauthorized");
+                toast.error(data.title);
                 break;
             case 404:
-                toast.error("Not Found");
+                router.navigate("/not-found", { state: { error: data } });
                 break;
-            // case 422:
-            //     toast.error(data.errors[0].message);
-            //     break;
             case 500:
-                toast.error("Internal Server Error");
+                router.navigate("/server-error", { state: { error: data } });
                 break;
             default:
-                // toast.error("Unknown Error");
                 break;
         }
-        return Promise.reject(error); // 让错误继续向上传递
+        return Promise.reject(error.response); // 让错误继续向上传递
     }
 );
 

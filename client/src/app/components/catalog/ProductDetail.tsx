@@ -1,9 +1,9 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Product } from "../../models/product";
 import { Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
 import agent from "../../api/agent";
+import Loading from "../loading/Loading";
 
 export default function ProductDetail() {
   // Todo: 需要在详情组件访问 router参数，并显示相应的产品信息
@@ -21,7 +21,7 @@ export default function ProductDetail() {
   }, [id]);
 
   if (loading) {
-    return <Typography variant="h4">Loading...</Typography>
+    return <Loading message="Loading product details..." />
   }
 
   if (!product) {
