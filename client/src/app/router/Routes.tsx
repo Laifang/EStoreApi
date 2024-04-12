@@ -8,6 +8,7 @@ import ProductDetail from "../components/catalog/ProductDetail";
 import ServerError from "../components/error/ServerError";
 import NotFound from "../components/error/NotFound";
 import ShoppingCartPage from "../components/shoppingCart/ShoppingCartPage";
+import CheckoutPage from "../components/catalog/CheckoutPage";
 
 
 const router = createBrowserRouter([
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
             { path: "server-error", element: <ServerError /> },
             { path: "not-found", element: <NotFound /> },
             { path: "shopingcart", element: <ShoppingCartPage /> },
+            { path: "checkout", element: <CheckoutPage /> },
             { path: "*", element: <NotFound /> }
         ]
     }

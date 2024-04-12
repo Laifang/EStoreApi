@@ -1,25 +1,60 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Product } from "../../models/Product";
-import { Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
+import { Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography } from "@mui/material";
 import agent from "../../api/agent";
 import Loading from "../loading/Loading";
+import { useStoreContext } from "../../context/StoreContext";
+import { LoadingButton } from "@mui/lab";
+import { ShoppingCart } from "../../models/ShoppingCart";
 
 export default function ProductDetail() {
   // Todo: 需要在详情组件访问 router参数，并显示相应的产品信息
+  const { shoppingCart, setShoppingCart } = useStoreContext();
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(0); // 已加购数量
+  const [updating, setUpdating] = useState(false); // 购物车中是否存在该商品
+  const item = shoppingCart?.items.find(item => item.productId === product?.id); // 购物车中是否存在该商品
 
 
   useEffect(() => {
-    // 保证id参数存在
+    if (item) setQuantity(item.quantity);
     id && agent.Catalog.detail(parseInt(id))
       .then((product: Product) => setProduct(product))
       .catch((error) => console.error(error.response))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, item]);
 
+
+  // 给加购数量组件添加 onChanged 事件 实现能够改变已加购数量
+  function handleQuantityChange(event: ChangeEvent<HTMLInputElement>) {
+    if (parseInt(event.currentTarget.value) >= 0) {
+      setQuantity(parseInt(event.currentTarget.value));
+    }
+  }
+
+  function handleUpdateQuantity() {
+    if (!product) return;
+    setUpdating(true);
+    // 已加购数量小于页面显示的数量，则增加购物车中该商品的数量
+    if (!item || quantity > item.quantity) {
+      const addQuantity = item ? quantity - item.quantity : quantity;
+      agent.ShoppingCart.addItem(product.id, addQuantity)
+        .then((cart: ShoppingCart) => setShoppingCart(cart))
+        .catch((error) => console.error(error.response))
+        .finally(() => setUpdating(false));
+    } else {
+      // 已加购数量大于页面显示的数量,则减少购物车中该商品的数量
+      const decraseQuantity = item.quantity - quantity;
+      agent.ShoppingCart.removeItem(product.id, decraseQuantity)
+        .then((cart: ShoppingCart) => setShoppingCart(cart))
+        .catch((error) => console.error(error.response))
+        .finally(() => setUpdating(false));
+
+    }
+  }
   if (loading) {
     return <Loading message="Loading product details..." />
   }
@@ -64,6 +99,32 @@ export default function ProductDetail() {
               </TableBody>
             </Table>
           </TableContainer>
+          {/* 这里是已加购数量和加购按钮 */}
+          <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Grid item xs={6}>
+              <TextField
+                onChange={handleQuantityChange}
+                variant="outlined"
+                type="number"
+                label="已加购数量"
+                value={quantity}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <LoadingButton
+                disabled={item?.quantity === quantity || !item && quantity === 0}
+                variant="contained"
+                color="primary"
+                sx={{ height: '55px' }}
+                size="large"
+                loading={updating}
+                onClick={handleUpdateQuantity}
+              >
+                {item ? "更新数量" : "加购物车"}
+              </LoadingButton>
+            </Grid>
+          </Grid>
 
         </Grid>
       </Grid>

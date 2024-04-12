@@ -1,10 +1,11 @@
-import { Box, Button, Grid, Link, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { Add, Delete, Remove } from "@mui/icons-material";
 import { useStoreContext } from "../../context/StoreContext";
 import { Fragment, useState } from "react";
 import agent from "../../api/agent";
 import LoadingButton from '@mui/lab/LoadingButton';
 import ShoppingCartSummary from "./ShoppingCartSummary";
+import { Link } from "react-router-dom";
 
 export default function ShoppingCartPage() {
 
@@ -95,13 +96,12 @@ export default function ShoppingCartPage() {
                     <ShoppingCartSummary />
                     <Button
                         component={Link}
-                        to='/checkout'
+                        to={'/checkout'}
                         variant='contained'
                         size='large'
                         fullWidth>
                         结算
                     </Button>
-
                 </Grid>
             </Grid>
         </Fragment>

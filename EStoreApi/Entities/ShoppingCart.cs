@@ -36,8 +36,14 @@ public class ShoppingCart
         if (item == null) return;
 
         // 商品数量减少到0，则从购物车中移除
-        if (item.Quantity <= quantity) Items.Remove(item);
+        if (item.Quantity <= quantity) 
+        { 
+            Items.Remove(item); 
+            return; 
+        }
         // 商品数量大于0，则减少数量
-        item.Quantity -= quantity;
+       
+        item.Quantity -= quantity; 
+        
     }
 }
