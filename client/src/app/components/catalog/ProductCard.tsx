@@ -3,22 +3,23 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { Link } from "react-router-dom";
 import agent from "../../api/agent";
 import { useState } from "react";
-import { useStoreContext } from "../../context/StoreContext";
-import { Product } from "../../models/Product";
+import { useAppDispatch } from "../../store/configureStore";
+import { setCart } from "../shoppingCart/shoppingCartSlice";
+import {Product} from "../../models/Product";
 interface Props {
     product: Product;
 }
 
 export default function ProductCard({ product }: Props) {
     const [loading, setLoading] = useState(false);
-    const { setShoppingCart } = useStoreContext();
-
+    // const { shoppingCart } = useAppSelector(state => state.shoppingCart);
+    const dispatch = useAppDispatch();
     function handleAddItem(productId: number) {
         setLoading(true);
         agent.ShoppingCart.addItem(productId)
             // 2024年04月11日23:26:39 新增,因为ShoppingCart.addItem返回的是cart,
             // 所以这里可用返回值更新store中的shoppingCart状态
-            .then(cart => setShoppingCart(cart))
+            .then(cart => dispatch(setCart(cart)))
             .catch(error => console.log(error))
             .finally(() => setLoading(false));
     }

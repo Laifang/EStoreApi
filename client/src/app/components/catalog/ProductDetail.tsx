@@ -4,13 +4,16 @@ import { Product } from "../../models/Product";
 import { Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography } from "@mui/material";
 import agent from "../../api/agent";
 import Loading from "../loading/Loading";
-import { useStoreContext } from "../../context/StoreContext";
 import { LoadingButton } from "@mui/lab";
 import { ShoppingCart } from "../../models/ShoppingCart";
+import { useAppDispatch, useAppSelector } from "../../store/configureStore";
+import { removeItem, setCart } from "../shoppingCart/shoppingCartSlice";
 
 export default function ProductDetail() {
   // Todo: 需要在详情组件访问 router参数，并显示相应的产品信息
-  const { shoppingCart, setShoppingCart } = useStoreContext();
+
+  const { shoppingCart } = useAppSelector((state) => state.shoppingCart);
+  const dispatch = useAppDispatch();
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,14 +45,14 @@ export default function ProductDetail() {
     if (!item || quantity > item.quantity) {
       const addQuantity = item ? quantity - item.quantity : quantity;
       agent.ShoppingCart.addItem(product.id, addQuantity)
-        .then((cart: ShoppingCart) => setShoppingCart(cart))
+        .then((cart: ShoppingCart) => dispatch(setCart(cart)))
         .catch((error) => console.error(error.response))
         .finally(() => setUpdating(false));
     } else {
       // 已加购数量大于页面显示的数量,则减少购物车中该商品的数量
       const decraseQuantity = item.quantity - quantity;
       agent.ShoppingCart.removeItem(product.id, decraseQuantity)
-        .then((cart: ShoppingCart) => setShoppingCart(cart))
+        .then(() => dispatch(removeItem({ productId: product.id, quantity: decraseQuantity })))
         .catch((error) => console.error(error.response))
         .finally(() => setUpdating(false));
 
