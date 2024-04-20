@@ -1,13 +1,40 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ShoppingCart } from "../../models/ShoppingCart";
+import agent from "../../api/agent";
 
 interface ShoppingCartState {
   shoppingCart: ShoppingCart | null;
+  status: string;
 }
 
 const initialState: ShoppingCartState = {
   shoppingCart: null,
+  status: "idle", // idle 是指初始状态，loading 是指正在加载数据，success 是指数据加载成功，error 是指数据加载失败,pending 是指正在请求数据
 };
+
+// 异步新增购物车商品
+export const AddCartItemAsync = createAsyncThunk<ShoppingCart, { productId: number; quantity?: number }>(
+  "shoppingCart/addCartItemAsync", // 第一个参数是 prefix/actionType，
+  async ({ productId, quantity = 1 }) => {
+    try {
+      return await agent.ShoppingCart.addItem(productId, quantity);
+    } catch (error) {
+      console.log(error);
+    }
+  } // 第二个参数是 action 异步委托
+);
+
+// 异步删除购物车商品
+export const RemoveCartItemAsync = createAsyncThunk<
+  ShoppingCart,
+  { productId: number; quantity?: number; name?: string }
+>("shoppingCart/removeItemAsync", async ({ productId, quantity = 1 }) => {
+  try {
+    return await agent.ShoppingCart.removeItem(productId, quantity);
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 export const shoppingCartSlice = createSlice({
   name: "shoppingCart",
@@ -41,8 +68,35 @@ export const shoppingCartSlice = createSlice({
       // 最后更新购物车状态
     },
   },
+  extraReducers: (builder) => {
+    // 处理异步请求开始的情况
+    builder.addCase(AddCartItemAsync.pending, (state, action) => {
+      state.status = "pendingAddItem" + action.meta.arg.productId; // 给状态添加 productId 后缀，以区分不同的商品
+    });
+    // 处理异步请求成功的情况
+    builder.addCase(AddCartItemAsync.fulfilled, (state, action) => {
+      state.status = "idle";
+      state.shoppingCart = action.payload;
+    });
+    // 处理异步请求拒绝的情况
+    builder.addCase(AddCartItemAsync.rejected, (state) => {
+      state.status = "error";
+    });
+
+    // 移除购物车商品
+    builder.addCase(RemoveCartItemAsync.pending, (state, action) => {
+      state.status = "pendingRemoveItem" + action.meta.arg.productId + action.meta.arg.name;
+    });
+    builder.addCase(RemoveCartItemAsync.fulfilled, (state, action) => {
+      state.status = "idle";
+      state.shoppingCart = action.payload;
+    });
+    builder.addCase(RemoveCartItemAsync.rejected, (state) => {
+      state.status = "error";
+    });
+  },
 });
 
-export const { setCart, removeItem } = shoppingCartSlice.actions;
+export const { setCart } = shoppingCartSlice.actions;
 
 export default shoppingCartSlice.reducer;
