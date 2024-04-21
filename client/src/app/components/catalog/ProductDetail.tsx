@@ -1,6 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Product } from "../../models/Product";
 import {
   Divider,
   Grid,
@@ -12,32 +11,25 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import agent from "../../api/agent";
 import Loading from "../loading/Loading";
 import { LoadingButton } from "@mui/lab";
 import { useAppDispatch, useAppSelector } from "../../store/configureStore";
 import { AddCartItemAsync, RemoveCartItemAsync } from "../shoppingCart/shoppingCartSlice";
+import { fetchProductAsync, productSelectors } from "./catalogSlice";
 
 export default function ProductDetail() {
-  // Todo: 需要在详情组件访问 router参数，并显示相应的产品信息
-
-  const { shoppingCart, status } = useAppSelector((state) => state.shoppingCart);
-  const dispatch = useAppDispatch();
   const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { shoppingCart, status: shoppingCartStatus } = useAppSelector((state) => state.shoppingCart);
+  const dispatch = useAppDispatch();
+  const { status: productStatus } = useAppSelector((state) => state.catalog);
+  const product = useAppSelector((state) => productSelectors.selectById(state, parseInt(id!)));
   const [quantity, setQuantity] = useState(0); // 已加购数量
-  // const [updating, setUpdating] = useState(false); // 购物车中是否存在该商品
   const item = shoppingCart?.items.find((item) => item.productId === product?.id); // 购物车中是否存在该商品
 
   useEffect(() => {
     if (item) setQuantity(item.quantity);
-    id &&
-      agent.Catalog.detail(parseInt(id))
-        .then((product: Product) => setProduct(product))
-        .catch((error) => console.error(error.response))
-        .finally(() => setLoading(false));
-  }, [id, item]);
+    id && !product && dispatch(fetchProductAsync(parseInt(id)));
+  }, [id, item, dispatch, product]);
 
   // 给加购数量组件添加 onChanged 事件 实现能够改变已加购数量
   function handleQuantityChange(event: ChangeEvent<HTMLInputElement>) {
@@ -59,7 +51,7 @@ export default function ProductDetail() {
       dispatch(RemoveCartItemAsync({ productId: product.id, quantity: decraseQuantity }));
     }
   }
-  if (loading) {
+  if (productStatus.includes("pending")) {
     return <Loading message="Loading product details..." />;
   }
 
@@ -124,7 +116,10 @@ export default function ProductDetail() {
                 color="primary"
                 sx={{ height: "55px" }}
                 size="large"
-                loading={status === "pendingRemoveItem" + item?.productId}
+                loading={
+                  shoppingCartStatus === "pendingAddItem" + product?.id ||
+                  shoppingCartStatus === "pendingRemoveItem" + item?.productId
+                }
                 onClick={handleUpdateQuantity}
               >
                 {item ? "更新数量" : "加购物车"}
