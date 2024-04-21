@@ -36,7 +36,8 @@ export default function Header({ handleThemeChange, darkMode }: Props) {
     const itemsCount = shoppingCart?.items.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
-        <AppBar position='static' sx={{ mb: 4 }}>
+        // sticky 属性使得 AppBar 始终保持在页面顶部
+        <AppBar position='sticky' sx={{ mb: 4 }}>  
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box display='flex' alignItems='center'>
                     <Typography

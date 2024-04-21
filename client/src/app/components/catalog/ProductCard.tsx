@@ -42,7 +42,7 @@ export default function ProductCard({ product }: Props) {
       </CardContent>
       <CardActions>
         <LoadingButton
-          loading={status === 'pendingAddItem' + product.id} // 添加product.id 只刷新当前商品的loading状态
+          loading={status === "pendingAddItem" + product.id} // 添加product.id 只刷新当前商品的loading状态
           onClick={() => dispatch(AddCartItemAsync({ productId: product.id }))}
           size="small"
         >
