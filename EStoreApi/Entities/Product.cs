@@ -17,7 +17,7 @@ public class Product
     public string? Description { get; set; }
 
     // 商品价格
-    public decimal Price { get; set; } = 0;
+    public long Price { get; set; } = 0;
 
     // 商品图片链接
     public string? ImageUrl { get; set; }

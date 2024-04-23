@@ -6,21 +6,27 @@ using SQLitePCL;
 
 namespace EStoreApi.Controllers;
 
-
 public class ProductsController : BasicApiController
 {
     private readonly StoreContext _context;
+
     public ProductsController(StoreContext context)
     {
         _context = context;
     }
 
-
     [HttpGet]
-    public async Task<ActionResult<List<Product>>> GetProductsAsync()
+    public async Task<ActionResult<List<Product>>> GetProductsAsync(string? orderBy)
     {
-        var products = await _context.Products.ToListAsync();
-        return Ok(products);
+    
+        var query = _context.Products.AsQueryable();
+        query = orderBy switch
+        {
+            "price" => query.OrderBy(x => x.Price),
+            "priceDesc" => query.OrderByDescending(x => x.Price),
+            _ => query.OrderBy(x => x.Name) // _的方式是默认排序
+        };
+        return Ok(await query.ToListAsync());
     }
 
     [HttpGet("{id}")]
@@ -41,6 +47,4 @@ public class ProductsController : BasicApiController
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetProductAsync), new { id = product.Id }, product);
     }
-
-
 }
