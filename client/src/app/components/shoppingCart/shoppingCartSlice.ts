@@ -15,11 +15,11 @@ const initialState: ShoppingCartState = {
 // 异步新增购物车商品
 export const AddCartItemAsync = createAsyncThunk<ShoppingCart, { productId: number; quantity?: number }>(
   "shoppingCart/addCartItemAsync", // 第一个参数是 prefix/actionType，
-  async ({ productId, quantity = 1 }) => {
+  async ({ productId, quantity = 1 }, thunkAPI) => {
     try {
       return await agent.ShoppingCart.addItem(productId, quantity);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue({ error: error.data });
     }
   } // 第二个参数是 action 异步委托
 );
@@ -28,11 +28,12 @@ export const AddCartItemAsync = createAsyncThunk<ShoppingCart, { productId: numb
 export const RemoveCartItemAsync = createAsyncThunk<
   ShoppingCart,
   { productId: number; quantity?: number; name?: string }
->("shoppingCart/removeItemAsync", async ({ productId, quantity = 1 }) => {
+>("shoppingCart/removeItemAsync", 
+async ({ productId, quantity = 1 }, thunkAPI) => {
   try {
     return await agent.ShoppingCart.removeItem(productId, quantity);
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue({ error: error.data });
   }
 });
 

@@ -6,7 +6,9 @@ using EStoreApi.Entities;
 using EStoreApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 namespace EStoreApi.Controllers;
+
 public class ShoppingCartsController : BasicApiController
 {
     private readonly StoreContext _context;
@@ -21,18 +23,20 @@ public class ShoppingCartsController : BasicApiController
     {
         var shoppingcart = await CheckShoppingCart();
 
-        if (shoppingcart == null) return NotFound();
+        if (shoppingcart == null)
+            return NotFound();
 
         // Todo： Dto 与 model的转换 太麻烦了 有没有更优雅自动化的办法
         return MapShoppingCartDto(shoppingcart);
     }
 
-
-
     // Add Item To shopping cart
 
     [HttpPost("addItem")]
-    public async Task<ActionResult<ShoppingCartDto>> AddItemToShoppingCart(int productId, int quantity = 1)
+    public async Task<ActionResult<ShoppingCartDto>> AddItemToShoppingCart(
+        int productId,
+        int quantity = 1
+    )
     {
         // 1. 获取/创建 shpping cart
         // 2. 获取/检查 product
@@ -43,11 +47,13 @@ public class ShoppingCartsController : BasicApiController
         var shoppingcart = await CheckShoppingCart();
         shoppingcart ??= CreateShoppingCart();
         var product = await _context.FindAsync<Product>(productId);
-        if (product == null) return NotFound();
+        if (product == null)
+            return BadRequest(new ProblemDetails { Title = "商品不存在" });
         shoppingcart.AddItem(product, quantity);
         var addResutl = await _context.SaveChangesAsync() > 0;
 
-        if (addResutl) return CreatedAtRoute(nameof(GetShoppingCart), MapShoppingCartDto(shoppingcart));
+        if (addResutl)
+            return CreatedAtRoute(nameof(GetShoppingCart), MapShoppingCartDto(shoppingcart));
 
         return BadRequest(new ProblemDetails { Title = "向购物车添加商品时发生错误" });
     }
@@ -62,34 +68,35 @@ public class ShoppingCartsController : BasicApiController
         // 5. 返回 201
 
         var shoppingcart = await CheckShoppingCart();
-        if (shoppingcart == null) return NotFound();
+        if (shoppingcart == null)
+            return NotFound();
 
         var isProductExists = await _context.FindAsync<Product>(productId) != null;
-        if (!isProductExists) return BadRequest(new ProblemDetails { Title = "商品不存在" });
+        if (!isProductExists)
+            return BadRequest(new ProblemDetails { Title = "商品不存在" });
 
         var isProductInShoppingCart = shoppingcart.Items.All(i => i.ProductId != productId);
-        if (isProductInShoppingCart) return BadRequest(new ProblemDetails { Title = "商品不在购物车中" });
+        if (isProductInShoppingCart)
+            return BadRequest(new ProblemDetails { Title = "商品不在购物车中" });
 
         shoppingcart.RemoveItem(productId, quantity);
         var removeResult = await _context.SaveChangesAsync() > 0;
-        if (removeResult) return CreatedAtRoute(nameof(GetShoppingCart), MapShoppingCartDto(shoppingcart));
+        if (removeResult)
+            return CreatedAtRoute(nameof(GetShoppingCart), MapShoppingCartDto(shoppingcart));
 
         return BadRequest(new ProblemDetails { Title = "从购物车中移除商品时发生错误" });
     }
 
-
     private async Task<ShoppingCart?> CheckShoppingCart()
     {
-        return await _context.ShoppingCarts
-                .Include(cart => cart.Items)
-                .ThenInclude(p => p.Product)
-                .FirstOrDefaultAsync(x => x.UserId == Request.Cookies["userId"]);
+        return await _context
+            .ShoppingCarts.Include(cart => cart.Items)
+            .ThenInclude(p => p.Product)
+            .FirstOrDefaultAsync(x => x.UserId == Request.Cookies["userId"]);
     }
-
 
     private ShoppingCart CreateShoppingCart()
     {
-
         var userId = Guid.NewGuid().ToString();
 
         var cookieOptions = new CookieOptions
@@ -106,9 +113,7 @@ public class ShoppingCartsController : BasicApiController
         _context.ShoppingCarts.Add(shoppingcart);
         _context.SaveChanges();
         return shoppingcart;
-
     }
-
 
     private ShoppingCartDto MapShoppingCartDto(ShoppingCart shoppingcart)
     {
@@ -116,17 +121,18 @@ public class ShoppingCartsController : BasicApiController
         {
             Id = shoppingcart.Id,
             UserId = shoppingcart.UserId,
-            Items = shoppingcart.Items.Select(item => new ShoppingCartItemDto
-            {
-                ProductId = item.ProductId,
-                Price = item.Product.Price,
-                ProductName = item.Product.Name,
-                ImageUrl = item.Product.ImageUrl,
-                Type = item.Product.Type,
-                Brand = item.Product.Brand,
-                Quantity = item.Quantity
-            }).ToList()
+            Items = shoppingcart
+                .Items.Select(item => new ShoppingCartItemDto
+                {
+                    ProductId = item.ProductId,
+                    Price = item.Product.Price,
+                    ProductName = item.Product.Name,
+                    ImageUrl = item.Product.ImageUrl,
+                    Type = item.Product.Type,
+                    Brand = item.Product.Brand,
+                    Quantity = item.Quantity
+                })
+                .ToList()
         };
     }
-
 }

@@ -18,12 +18,19 @@ import { AddCartItemAsync, RemoveCartItemAsync } from "../shoppingCart/shoppingC
 import { fetchProductAsync, productSelectors } from "./catalogSlice";
 
 export default function ProductDetail() {
+  // 从url中 获取产品id 参数
   const { id } = useParams<{ id: string }>();
+  // 从 购物车相关状态
   const { shoppingCart, status: shoppingCartStatus } = useAppSelector((state) => state.shoppingCart);
   const dispatch = useAppDispatch();
+  // 商品列表 加载状态
   const { status: productStatus } = useAppSelector((state) => state.catalog);
+  // 单个商品信息获取
   const product = useAppSelector((state) => productSelectors.selectById(state, parseInt(id!)));
+
+  // 购物车数量状态
   const [quantity, setQuantity] = useState(0); // 已加购数量
+  // 购物车中是否存在该商品
   const item = shoppingCart?.items.find((item) => item.productId === product?.id); // 购物车中是否存在该商品
 
   useEffect(() => {
@@ -51,10 +58,13 @@ export default function ProductDetail() {
       dispatch(RemoveCartItemAsync({ productId: product.id, quantity: decraseQuantity }));
     }
   }
+
+  // 加载商品列表信息
   if (productStatus.includes("pending")) {
     return <Loading message="Loading product details..." />;
   }
 
+  // 加载商品信息
   if (!product) {
     return <Typography variant="h4">Product not found</Typography>;
   }

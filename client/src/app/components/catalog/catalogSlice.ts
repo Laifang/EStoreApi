@@ -8,21 +8,22 @@ import { RootState } from "../../store/configureStore";
 const productsAdapter = createEntityAdapter<Product>();
 
 // 创建一个异步Thunk，用于获取产品列表
-export const fetchProductsAsync = createAsyncThunk<Product[]>("catalog/fetchProductsAsync", async () => {
+export const fetchProductsAsync = createAsyncThunk<Product[]>("catalog/fetchProductsAsync", async (_, thunkAPI) => {
   try {
     return await agent.Catalog.list();
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue({ error: error.data });
   }
 });
 
 export const fetchProductAsync = createAsyncThunk<Product, number>(
   "catalog/fetchProductAsync",
-  async (productId: number) => {
+  async (productId: number, thunkAPI) => {
     try {
       return await agent.Catalog.detail(productId);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      // 这行代码将错误信息传递给 redux-thunk，以便在组件中显示
+      return thunkAPI.rejectWithValue({ error: error.data });
     }
   }
 );
