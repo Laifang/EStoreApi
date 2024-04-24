@@ -87,7 +87,7 @@ public class ShoppingCartsController : BasicApiController
         return BadRequest(new ProblemDetails { Title = "从购物车中移除商品时发生错误" });
     }
 
-    private async Task<ShoppingCart?> CheckShoppingCart()
+    private async Task<ShoppingCart> CheckShoppingCart()
     {
         return await _context
             .ShoppingCarts.Include(cart => cart.Items)

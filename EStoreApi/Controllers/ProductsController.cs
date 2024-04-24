@@ -1,3 +1,4 @@
+using System.Text.Json;
 using EStoreApi.Data;
 using EStoreApi.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -16,17 +17,24 @@ public class ProductsController : BasicApiController
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Product>>> GetProductsAsync(string? orderBy)
+    public async Task<ActionResult<PageList<Product>>> GetProductsAsync(
+        [FromQuery] ProductParams productParams
+    )
     {
-    
-        var query = _context.Products.AsQueryable();
-        query = orderBy switch
-        {
-            "price" => query.OrderBy(x => x.Price),
-            "priceDesc" => query.OrderByDescending(x => x.Price),
-            _ => query.OrderBy(x => x.Name) // _的方式是默认排序
-        };
-        return Ok(await query.ToListAsync());
+        var query = _context
+            .Products.Sort(productParams.OrderBy)
+            .Search(productParams.SearchTerm)
+            .Filter(productParams.Brands, productParams.Types);
+
+        var products = await PageList<Product>.ToPageListAsync(
+            query,
+            productParams.PageNumber,
+            productParams.PageSize
+        );
+
+        Response.AddPaginationMetaData(products.MetaData);
+
+        return products;
     }
 
     [HttpGet("{id}")]
@@ -46,5 +54,15 @@ public class ProductsController : BasicApiController
         _context.Products.Add(product);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetProductAsync), new { id = product.Id }, product);
+    }
+
+    // 返回products 的 type 和 brand 列表 ，方便前端创建选择列表
+      [HttpGet("filters")]
+    public async Task<IActionResult> GetFiltersAsync()
+    {
+        var brands = await _context.Products.Select(p => p.Brand).Distinct().ToListAsync();
+        var types = await _context.Products.Select(p => p.Type).Distinct().ToListAsync();
+
+        return Ok(new { brands, types });
     }
 }
