@@ -28,12 +28,24 @@ export const fetchProductAsync = createAsyncThunk<Product, number>(
   }
 );
 
+// 创建异步Thunk，用于获取 产品 filters
+export const fetchFiltersAsync = createAsyncThunk("catalog/fetchFiltersAsync", async (_, thunkAPI) => {
+  try {
+    return await agent.Catalog.fetchFilters();
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue({ error: error.data });
+  }
+});
+
 // 创建并导出catalogSlice
 export const catalogSlice = createSlice({
   name: "catalog",
   initialState: productsAdapter.getInitialState({
     productsLoaded: false,
+    filtersLoaded: false,
     status: "idle",
+    brands: [],
+    types: [],
   }),
   reducers: {},
   extraReducers: (builder) => {
@@ -63,6 +75,20 @@ export const catalogSlice = createSlice({
         state.status = "idle";
       })
       .addCase(fetchProductAsync.rejected, (state) => {
+        state.status = "idle";
+      })
+
+      // filters 相关处理
+      .addCase(fetchFiltersAsync.pending, (state) => {
+        state.status = "pendingFetchFilters";
+      })
+      .addCase(fetchFiltersAsync.fulfilled, (state, action) => {
+        state.brands = action.payload.brands;
+        state.types = action.payload.types;
+        state.status = "idle";
+        state.filtersLoaded = true;
+      })
+      .addCase(fetchFiltersAsync.rejected, (state) => {
         state.status = "idle";
       });
   },

@@ -64,6 +64,7 @@ const requests = {
 const Catalog = {
     list: () => requests.get("/products"),
     detail: (id: number) => requests.get(`/products/${id}`),
+    fetchFilters: () => requests.get("/products/filters"),
 }
 
 // 定义测试错误API
