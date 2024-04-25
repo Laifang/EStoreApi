@@ -1,12 +1,12 @@
 export interface Product {
-    id: number;
-    name: string;
-    description: string;
-    price: number;
-    imageUrl: string;
-    brand: string;
-    type?: string,
-    quantityInStock?: number
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  brand: string;
+  type?: string;
+  quantityInStock?: number;
 }
 /*
 json to ts interface
@@ -23,3 +23,12 @@ json to ts interface
 }
 
 */
+
+export interface ProductParams {
+  orderBy: string;
+  searchTerm?: string;
+  types?: string[];
+  brands?: string[];
+  pageNumber: number;
+  pageSize: number;
+}
