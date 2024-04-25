@@ -2,22 +2,20 @@ import ProductList from "./ProductList";
 import { useEffect } from "react";
 import Loading from "../loading/Loading";
 import { useAppDispatch, useAppSelector } from "../../store/configureStore";
-import { fetchFiltersAsync, fetchProductsAsync, productSelectors } from "./catalogSlice";
+import { fetchFiltersAsync, fetchProductsAsync, productSelectors, setProductParams } from "./catalogSlice";
 import {
   Box,
   Checkbox,
-  FormControl,
   FormControlLabel,
   FormGroup,
   FormLabel,
   Grid,
   Pagination,
   Paper,
-  Radio,
-  RadioGroup,
   Typography,
 } from "@mui/material";
 import ProductSearch from "./ProductSearch";
+import RadioButtonGroup from "../../components/RadioButtonGroup";
 
 const sortOptions = [
   { value: "name", label: "商品名称" },
@@ -28,7 +26,7 @@ const sortOptions = [
 export default function Catalog() {
   const products = useAppSelector(productSelectors.selectAll);
   const dispatch = useAppDispatch();
-  const { productsLoaded, status, filtersLoaded, brands, types } = useAppSelector((state) => state.catalog);
+  const { productsLoaded, filtersLoaded, brands, types, productParams } = useAppSelector((state) => state.catalog);
 
   useEffect(() => {
     if (!productsLoaded) dispatch(fetchProductsAsync());
@@ -40,7 +38,7 @@ export default function Catalog() {
     }
   }, [filtersLoaded, dispatch]);
 
-  if (status.includes("pending")) return <Loading message="Loading products..." />;
+  if (!productsLoaded) return <Loading message="Loading products..." />;
 
   return (
     <Grid container spacing={4}>
@@ -49,14 +47,11 @@ export default function Catalog() {
           <ProductSearch />
         </Paper>
         <Paper sx={{ mb: 2, p: 2 }}>
-          <FormControl component="fieldset">
-            <FormLabel>排序</FormLabel>
-            <RadioGroup>
-              {sortOptions.map(({ value, label }) => (
-                <FormControlLabel value={value} control={<Radio />} label={label} key={value} />
-              ))}
-            </RadioGroup>
-          </FormControl>
+          <RadioButtonGroup
+            sortOptions={sortOptions}
+            selectedValue={productParams.orderBy}
+            handleOnChange={(e) => dispatch(setProductParams({orderBy: e.target.value}))}
+          />
         </Paper>
         <Paper sx={{ mb: 2, p: 2 }}>
           <FormGroup>
