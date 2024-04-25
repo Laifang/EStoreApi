@@ -6,9 +6,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import agent from "../api/agent";
-import Loading from "../components/loading/Loading";
+import Loading from "../pages/loading/Loading";
 import { useAppDispatch } from "../store/configureStore";
-import { setCart } from "../components/shoppingCart/shoppingCartSlice";
+import { setCart } from "../pages/shoppingCart/shoppingCartSlice";
 function App() {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);

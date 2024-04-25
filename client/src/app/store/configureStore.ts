@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
-import shoppingCartSlice from "../components/shoppingCart/shoppingCartSlice";
+import shoppingCartSlice from "../pages/shoppingCart/shoppingCartSlice";
 import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
-import { catalogSlice } from "../components/catalog/catalogSlice";
+import { catalogSlice } from "../pages/catalog/catalogSlice";
 
 
 const store = configureStore({
