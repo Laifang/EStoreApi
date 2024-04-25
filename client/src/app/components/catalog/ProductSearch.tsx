@@ -9,9 +9,9 @@ export default function ProductSearch() {
 
     const [searchTerm, setSearchTerm] = useState(productParams.searchTerm);
 
-    const debouncedSearch = debounce((event: any) => {
-        dispatch(setProductParams({ searchTerm: event.target.value }));
-    }, 1500);
+    const debouncedSearch = debounce((value: string) => {
+        dispatch(setProductParams({ searchTerm: value }));
+    }, 1000);
 
     return (
         <TextField
@@ -22,7 +22,7 @@ export default function ProductSearch() {
             value={searchTerm || ""}
             onChange={(event: any) => {
                 setSearchTerm(event.target.value);
-                debouncedSearch(event);
+                debouncedSearch(event.target.value);
             }}
         />
     );

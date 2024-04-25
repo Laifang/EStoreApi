@@ -52,6 +52,14 @@ axios.interceptors.response.use(
 );
 
 
+// URLSearchParams  接口作用: 用于构造URL查询字符串，可以方便地将对象转换为查询字符串。
+// 例如：
+// const params = new URLSearchParams();
+// params.append("name", "John");
+// params.append("age", "30");
+// const url = "https://example.com/search?" + params.toString();
+// console.log(url); // "https://example.com/search?name=John&age=30"
+
 // 封装axios请求，
 const requests = {
     get: (url: string,params?:URLSearchParams) => axios.get(url,{params}).then(responseBody),
