@@ -15,9 +15,9 @@ import {
   Paper,
   Radio,
   RadioGroup,
-  TextField,
   Typography,
 } from "@mui/material";
+import ProductSearch from "./ProductSearch";
 
 const sortOptions = [
   { value: "name", label: "商品名称" },
@@ -46,7 +46,7 @@ export default function Catalog() {
     <Grid container spacing={4}>
       <Grid item xs={3}>
         <Paper sx={{ mb: 2 }}>
-          <TextField label="搜索产品" variant="outlined" fullWidth placeholder="输入产品名称" />
+          <ProductSearch />
         </Paper>
         <Paper sx={{ mb: 2, p: 2 }}>
           <FormControl component="fieldset">
