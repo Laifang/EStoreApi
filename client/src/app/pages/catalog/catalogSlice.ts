@@ -3,6 +3,7 @@ import { createEntityAdapter, createAsyncThunk, createSlice } from "@reduxjs/too
 import { Product, ProductParams } from "../../models/Product";
 import agent from "../../api/agent";
 import { RootState } from "../../store/configureStore";
+import { MetaData, PaginatedResponse } from "../../models/Pagination";
 
 // 创建catalog State 数据类型
 interface CatalogState {
@@ -12,6 +13,7 @@ interface CatalogState {
   brands: string[];
   types: string[];
   productParams: ProductParams;
+  metaData: MetaData | null;
 }
 
 // 创建一个 entity adapter 用于将
@@ -28,14 +30,30 @@ const getAxiosParams = (productParams: ProductParams) => {
   return params;
 };
 
-// 创建一个异步Thunk，用于获取产品列表 , <Product[]> 类型表示异步Thunk返回的类型,void 表示Thunk的输入参数类型, { state: RootState } thunkAPI 可访问 Redux store 的 RootState,也就是全局的 state数据都可以获取
+/*
+  创建一个异步Thunk，用于获取产品列表 , <Product[]> 类型表示异步Thunk返回的类型,void 表示Thunk的输入参数类型,
+  { state: RootState } thunkAPI 可访问 Redux store 的 RootState,也就是全局的 state数据都可以获取
+*/
+/**
+ * 异步函数用来获取产品列表
+ * @param void 无输入参数
+ * @param { state: RootState }  包含了全局状态的对象
+ * @returns Product[] 包含产品信息的数组
+ */
 export const fetchProductsAsync = createAsyncThunk<Product[], void, { state: RootState }>(
   "catalog/fetchProductsAsync",
   async (_, thunkAPI) => {
+    // 获取API请求参数
     const queryParams = getAxiosParams(thunkAPI.getState().catalog.productParams);
     try {
-      return await agent.Catalog.list(queryParams);
+      // 发起获取产品列表的请求
+      const response: PaginatedResponse<Product[]> = await agent.Catalog.list(queryParams);
+      // 将元数据更新到全局状态中
+      thunkAPI.dispatch(setMetaData(response.metaData));
+      // 注意这里的返回值的变量名称要与 PaginatedResponse<Product> 中的定义的要一致
+      return response.items; // 返回产品列表
     } catch (error: any) {
+      // 如果请求失败，通过 thunkAPI.rejectWithValue 返回错误信息
       return thunkAPI.rejectWithValue({ error: error.data });
     }
   }
@@ -67,7 +85,7 @@ const initProductParams = () => {
     pageNumber: 1,
     pageSize: 6,
     orderBy: "name",
-  }
+  };
 };
 
 // 创建并导出catalogSlice
@@ -80,6 +98,7 @@ export const catalogSlice = createSlice({
     brands: [],
     types: [],
     productParams: initProductParams(),
+    metaData: null,
   }),
   reducers: {
     setProductParams: (state, action) => {
@@ -90,6 +109,11 @@ export const catalogSlice = createSlice({
 
     resetProductParams: (state) => {
       state.productParams = initProductParams();
+    },
+
+    // 设置metaData
+    setMetaData: (state, action) => {
+      state.metaData = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -143,6 +167,6 @@ export const productSelectors = productsAdapter.getSelectors((state: RootState) 
 
 // 导出 catalogSlice 的一般actions
 
-export const { setProductParams, resetProductParams } = catalogSlice.actions;
+export const { setProductParams, resetProductParams, setMetaData } = catalogSlice.actions;
 
 // export default catalogSlice.reducer;

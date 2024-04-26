@@ -28,7 +28,7 @@ export interface ProductParams {
   orderBy: string;
   searchTerm?: string;
   types?: string[];
-  brands: string[] | null;
+  brands?: string[] | null;
   pageNumber: number;
   pageSize: number;
 }

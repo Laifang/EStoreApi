@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import router from "../router/Routes";
+import { PaginatedResponse } from "../models/Pagination";
 
 const sleep = () => new Promise(resolve => setTimeout(resolve, 300))
 
@@ -16,6 +17,11 @@ const responseBody = (response: AxiosResponse) => response.data;
 axios.interceptors.response.use(
     async response => {
         await sleep(); // 延迟500ms，模拟网络延迟
+
+        const pagination = response.headers["pagination"];
+        if (pagination) {
+            response.data  = new PaginatedResponse(response.data,JSON.parse(pagination));
+        } 
         return response;
     },
     (error: AxiosError) => {
