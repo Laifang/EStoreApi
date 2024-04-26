@@ -10,7 +10,7 @@ function AppPagination({ metaData, onChange }: Props) {
   const { pageNumber, pageSize, totalCount, totalPages } = metaData;
 
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="center">
+    <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mt: 4 }}>
       <Typography>
         显示 {(pageNumber - 1) * pageSize + 1} -
         {pageNumber * pageSize > totalCount ? totalCount : pageNumber * pageSize} 条，共 {totalCount} 条

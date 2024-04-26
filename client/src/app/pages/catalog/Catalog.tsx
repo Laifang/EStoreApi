@@ -2,12 +2,11 @@ import ProductList from "./ProductList";
 import { useEffect } from "react";
 import Loading from "../loading/Loading";
 import { useAppDispatch, useAppSelector } from "../../store/configureStore";
-import { fetchFiltersAsync, fetchProductsAsync, productSelectors, setMetaData, setProductParams } from "./catalogSlice";
-import { Box, Grid, Pagination, Paper, Typography } from "@mui/material";
+import { fetchFiltersAsync, fetchProductsAsync, productSelectors, setProductParams } from "./catalogSlice";
+import { Grid, Paper } from "@mui/material";
 import ProductSearch from "./ProductSearch";
 import RadioButtonGroup from "../../components/RadioButtonGroup";
 import CheckboxGroup from "../../components/CheckboxGroup";
-import App from "../../layout/App";
 import AppPagination from "../../components/AppPagination";
 
 const sortOptions = [
@@ -33,11 +32,10 @@ export default function Catalog() {
     }
   }, [filtersLoaded, dispatch]);
 
-  if (!productsLoaded || !metaData)
-    return <Loading message="Loading products..." />;
+  if (!productsLoaded || !metaData) return <Loading message="Loading products..." />;
 
   return (
-    <Grid container spacing={4}>
+    <Grid container columnSpacing={4}>
       <Grid item xs={3}>
         <Paper sx={{ mb: 2 }}>
           <ProductSearch />
@@ -57,7 +55,7 @@ export default function Catalog() {
             onChange={(e) => dispatch(setProductParams({ brands: e }))}
           />
         </Paper>
-        <Paper sx={{ mb: 2, p: 2 }}>
+        <Paper sx={{ p: 2 }}>
           <CheckboxGroup
             filterTitle="类型"
             items={types}
@@ -68,14 +66,16 @@ export default function Catalog() {
       </Grid>
       <Grid item xs={9}>
         <ProductList products={products} />
+
+        {metaData && (
+          <AppPagination
+            metaData={metaData!}
+            onChange={(pageNumber: number) => dispatch(setProductParams({ pageNumber: pageNumber }))}
+          />
+        )}
       </Grid>
-      <Grid item xs={3} />
-      <Grid item xs={9} sx={{ mb: 2 }}>
-        <AppPagination
-          metaData={metaData!}
-          onChange={(pageNumber: number) => dispatch(setProductParams({ pageNumber: pageNumber }))}
-        />
-      </Grid>
+      {/* <Grid item xs={3} />
+      <Grid item xs={9}></Grid> */}
     </Grid>
   );
 }
