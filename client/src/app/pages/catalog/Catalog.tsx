@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import ProductSearch from "./ProductSearch";
 import RadioButtonGroup from "../../components/RadioButtonGroup";
+import CheckboxGroup from "../../components/CheckboxGroup";
 
 const sortOptions = [
   { value: "name", label: "商品名称" },
@@ -54,20 +55,20 @@ export default function Catalog() {
           />
         </Paper>
         <Paper sx={{ mb: 2, p: 2 }}>
-          <FormGroup>
-            <FormLabel>品牌</FormLabel>
-            {brands.map((brand) => (
-              <FormControlLabel control={<Checkbox />} label={brand} key={brand} />
-            ))}
-          </FormGroup>
+          <CheckboxGroup 
+            filterTitle="品牌"
+            items={brands}
+            checkedItemsInStore={productParams.brands}
+            onChange={(e) => dispatch(setProductParams({brands: e}))}
+          />
         </Paper>
         <Paper sx={{ mb: 2, p: 2 }}>
-          <FormGroup>
-            <FormLabel>类别</FormLabel>
-            {types.map((type) => (
-              <FormControlLabel control={<Checkbox />} label={type} key={type} />
-            ))}
-          </FormGroup>
+          <CheckboxGroup
+            filterTitle="类型"
+            items={types}
+            checkedItemsInStore={productParams.types}
+            onChange={(e) => dispatch(setProductParams({types: e}))}
+          />
         </Paper>
       </Grid>
       <Grid item xs={9}>
