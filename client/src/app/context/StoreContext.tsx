@@ -1,5 +1,5 @@
 import { PropsWithChildren, createContext, useContext, useState } from "react";
-import { ShoppingCart, ShoppingCartItem } from "../models/ShoppingCart";
+import { ShoppingCart, ShoppingCartItem } from "../models/shoppingCart";
 
 
 // 定义StoreContext的类型，用于共享上下文数据

@@ -2,7 +2,13 @@ import ProductList from "./ProductList";
 import { useEffect } from "react";
 import Loading from "../loading/Loading";
 import { useAppDispatch, useAppSelector } from "../../store/configureStore";
-import { fetchFiltersAsync, fetchProductsAsync, productSelectors, setProductParams } from "./catalogSlice";
+import {
+  fetchFiltersAsync,
+  fetchProductsAsync,
+  productSelectors,
+  setPageNumber,
+  setProductParams,
+} from "./catalogSlice";
 import { Grid, Paper } from "@mui/material";
 import ProductSearch from "./ProductSearch";
 import RadioButtonGroup from "../../components/RadioButtonGroup";
@@ -32,7 +38,7 @@ export default function Catalog() {
     }
   }, [filtersLoaded, dispatch]);
 
-  if (!productsLoaded || !metaData) return <Loading message="Loading products..." />;
+  if (!filtersLoaded) return <Loading message="Loading products..." />;
 
   return (
     <Grid container columnSpacing={4}>
@@ -70,7 +76,7 @@ export default function Catalog() {
         {metaData && (
           <AppPagination
             metaData={metaData!}
-            onChange={(pageNumber: number) => dispatch(setProductParams({ pageNumber: pageNumber }))}
+            onChange={(pageNumber: number) => dispatch(setPageNumber({ pageNumber: pageNumber }))}
           />
         )}
       </Grid>

@@ -3,7 +3,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/configureStore";
 import { AddCartItemAsync } from "../shoppingCart/shoppingCartSlice";
-import { Product } from "../../models/Product";
+import { Product } from "../../models/product";
 
 interface Props {
   product: Product;

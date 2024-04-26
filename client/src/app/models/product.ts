@@ -27,8 +27,8 @@ json to ts interface
 export interface ProductParams {
   orderBy: string;
   searchTerm?: string;
-  types?: string[];
-  brands?: string[] | null;
+  types: string[];
+  brands: string[];
   pageNumber: number;
   pageSize: number;
 }

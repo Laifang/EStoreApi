@@ -1,9 +1,9 @@
 // 创建 product 类型的 adapter
 import { createEntityAdapter, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { Product, ProductParams } from "../../models/Product";
+import { Product, ProductParams } from "../../models/product";
 import agent from "../../api/agent";
 import { RootState } from "../../store/configureStore";
-import { MetaData, PaginatedResponse } from "../../models/Pagination";
+import { MetaData, PaginatedResponse } from "../../models/pagination";
 
 // 创建catalog State 数据类型
 interface CatalogState {
@@ -25,8 +25,8 @@ const getAxiosParams = (productParams: ProductParams) => {
   params.append("pageSize", productParams.pageSize.toString());
   params.append("orderBy", productParams.orderBy);
   if (productParams.searchTerm) params.append("searchTerm", productParams.searchTerm);
-  if (productParams.brands) params.append("brands", productParams.brands.toString());
-  if (productParams.types) params.append("types", productParams.types.toString());
+  if (productParams.brands.length >0) params.append("brands", productParams.brands.toString());
+  if (productParams.types.length >0) params.append("types", productParams.types.toString());
   return params;
 };
 
@@ -85,6 +85,9 @@ const initProductParams = () => {
     pageNumber: 1,
     pageSize: 6,
     orderBy: "name",
+    types: [],
+    brands: [],
+    searchTerm: "",
   };
 };
 
@@ -104,11 +107,19 @@ export const catalogSlice = createSlice({
     setProductParams: (state, action) => {
       state.productsLoaded = false; // 重置 productsLoaded 状态,配合组件的useEffect 重新获取数据
       // 使用 ... 操作符 将 action.payload 合并到 state.productParams 中,达到更新 productParams 的效果
-      state.productParams = { ...state.productParams, ...action.payload };
+      // 2024年04月26日21:08:11 ，已知的bug，当翻页到第二页，再进行筛选或者搜索时，如果数据没有两页以上，则会导致页面空白，出现错误，
+      // 为了防止这种情况，需要在每次更改 productParams 时，重置 pageNumber 为 1,但是要单独区分 只更改 pageNumber 的情况
+      state.productParams = { ...state.productParams, ...action.payload, pageNumber: 1 };
     },
 
     resetProductParams: (state) => {
       state.productParams = initProductParams();
+    },
+
+    // 设置pageNumber 进行翻页
+    setPageNumber: (state, action) => {
+      state.productsLoaded = false; // 重置 productsLoaded 状态,配合组件的useEffect 重新获取数据
+      state.productParams = { ...state.productParams, ...action.payload };
     },
 
     // 设置metaData
@@ -167,6 +178,6 @@ export const productSelectors = productsAdapter.getSelectors((state: RootState) 
 
 // 导出 catalogSlice 的一般actions
 
-export const { setProductParams, resetProductParams, setMetaData } = catalogSlice.actions;
+export const { setProductParams, resetProductParams, setMetaData,setPageNumber } = catalogSlice.actions;
 
 // export default catalogSlice.reducer;

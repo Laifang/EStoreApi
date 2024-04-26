@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { ShoppingCart } from "../../models/ShoppingCart";
+import { ShoppingCart } from "../../models/shoppingCart";
 import agent from "../../api/agent";
 
 interface ShoppingCartState {

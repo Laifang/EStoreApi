@@ -1,5 +1,5 @@
 import { Box, Typography, Pagination } from "@mui/material";
-import { MetaData } from "../models/Pagination";
+import { MetaData } from "../models/pagination";
 
 interface Props {
   metaData: MetaData;
@@ -12,7 +12,7 @@ function AppPagination({ metaData, onChange }: Props) {
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mt: 4 }}>
       <Typography>
-        显示 {(pageNumber - 1) * pageSize + 1} -
+        显示 {(pageNumber - 1) * pageSize + 1}-
         {pageNumber * pageSize > totalCount ? totalCount : pageNumber * pageSize} 条，共 {totalCount} 条
       </Typography>
       <Pagination
